@@ -3,7 +3,7 @@ import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 import { ERC20 } from '../../generated/Factory/ERC20'
 import { ERC20SymbolBytes } from '../../generated/Factory/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../../generated/Factory/ERC20NameBytes'
-import { Bundle, Token, Pair } from '../../generated/schema'
+import { Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair } from '../../generated/schema'
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
@@ -157,13 +157,4 @@ export function createLiquidityPosition(exchange: Address, user: Address): Liqui
   }
   if (liquidityTokenBalance === null) log.error('LiquidityTokenBalance is null', [id])
   return liquidityTokenBalance as LiquidityPosition
-}
-
-export function createUser(address: Address): void {
-  let user = User.load(address.toHexString())
-  if (user === null) {
-    user = new User(address.toHexString())
-    user.usdSwapped = ZERO_BD
-    user.save()
-  }
 }
