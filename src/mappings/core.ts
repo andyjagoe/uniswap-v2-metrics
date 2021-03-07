@@ -2,6 +2,9 @@ import { BigDecimal } from '@graphprotocol/graph-ts'
 import { Swap } from '../../generated/templates/Pair/Pair'
 import {
   Buyer,
+  Pair,
+  Token,
+  Bundle,
 } from "../../generated/schema"
 import {
   convertTokenToDecimal,
@@ -9,7 +12,6 @@ import {
 } from './helpers'
 
 export function handleSwap(event: Swap): void {
-  /*
   let pair = Pair.load(event.address.toHexString())
   let token0 = Token.load(pair.token0)
   let token1 = Token.load(pair.token1)
@@ -33,20 +35,19 @@ export function handleSwap(event: Swap): void {
     .div(BigDecimal.fromString('2'))
   let derivedAmountUSD = derivedAmountETH.times(bundle.ethPrice)
 
-  */
-
   let buyer = Buyer.load(event.params.to.toHexString())
   if (buyer === null) {
     buyer = new Buyer(event.params.to.toHexString())
     buyer.createdAtBlockNumber = event.block.number
     buyer.createdAtTimestamp = event.block.timestamp
-    //buyer.totalVolumeUSD = derivedAmountUSD
-    //buyer.totalVolumeETH = derivedAmountETH
+    buyer.totalVolumeUSD = derivedAmountUSD
+    buyer.totalVolumeETH = derivedAmountETH
     buyer.txCount = ONE_BI
     buyer.save()
   } else {
-    //buyer.totalVolumeUSD = buyer.totalVolumeUSD.plus(derivedAmountUSD)
-    //buyer.totalVolumeETH = buyer.totalVolumeETH.plus(derivedAmountETH)
+    buyer.totalVolumeUSD = buyer.totalVolumeUSD.plus(derivedAmountUSD)
+    buyer.totalVolumeETH = buyer.totalVolumeETH.plus(derivedAmountETH)
     buyer.txCount = buyer.txCount.plus(ONE_BI)
+    buyer.save()
   } 
 }

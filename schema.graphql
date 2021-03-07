@@ -3,8 +3,8 @@ type Buyer @entity {
   createdAtTimestamp: BigInt!
   createdAtBlockNumber: BigInt!
   txCount: BigInt!
-  #totalVolumeUSD: BigDecimal!
-  #totalVolumeETH: BigDecimal! 
+  totalVolumeUSD: BigDecimal!
+  totalVolumeETH: BigDecimal! 
 }
 
 type UniswapFactory @entity {
