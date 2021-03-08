@@ -27,6 +27,9 @@ type UniswapFactory @entity {
 
   # transactions
   txCount: BigInt!
+
+  # user counts
+  buyerCount: BigInt!
 }
 
 type Token @entity {

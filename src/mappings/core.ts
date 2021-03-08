@@ -215,7 +215,7 @@ export function handleSync(event: Sync): void {
   let token1 = Token.load(pair.token1)
   let uniswap = UniswapFactory.load(FACTORY_ADDRESS)
 
-  // reset factory liquidity by subtracting onluy tarcked liquidity
+  // reset factory liquidity by subtracting onluy tracked liquidity
   uniswap.totalLiquidityETH = uniswap.totalLiquidityETH.minus(pair.trackedReserveETH as BigDecimal)
 
   // reset token total liquidity amounts
@@ -426,23 +426,6 @@ export function handleSwap(event: Swap): void {
   }
   
 
-  let buyer = Buyer.load(event.params.to.toHexString())
-  if (buyer === null) {
-    buyer = new Buyer(event.params.to.toHexString())
-    buyer.createdAtBlockNumber = event.block.number
-    buyer.createdAtTimestamp = event.block.timestamp
-    buyer.totalVolumeUSD = derivedAmountUSD
-    buyer.totalVolumeETH = derivedAmountETH
-    buyer.txCount = ONE_BI
-    buyer.save()
-  } else {
-    buyer.totalVolumeUSD = buyer.totalVolumeUSD.plus(derivedAmountUSD)
-    buyer.totalVolumeETH = buyer.totalVolumeETH.plus(derivedAmountETH)
-    buyer.txCount = buyer.txCount.plus(ONE_BI)
-    buyer.save()
-  }
-
-
   // update token0 global volume and token liquidity stats
   token0.tradeVolume = token0.tradeVolume.plus(amount0In.plus(amount0Out))
   token0.tradeVolumeUSD = token0.tradeVolumeUSD.plus(trackedAmountUSD)
@@ -471,6 +454,28 @@ export function handleSwap(event: Swap): void {
   uniswap.totalVolumeETH = uniswap.totalVolumeETH.plus(trackedAmountETH)
   uniswap.untrackedVolumeUSD = uniswap.untrackedVolumeUSD.plus(derivedAmountUSD)
   uniswap.txCount = uniswap.txCount.plus(ONE_BI)
+
+
+  // buyer user stats
+  let buyer = Buyer.load(event.params.to.toHexString())
+  if (buyer === null) {
+    buyer = new Buyer(event.params.to.toHexString())
+    buyer.createdAtBlockNumber = event.block.number
+    buyer.createdAtTimestamp = event.block.timestamp
+    buyer.totalVolumeUSD = derivedAmountUSD
+    buyer.totalVolumeETH = derivedAmountETH
+    buyer.txCount = ONE_BI
+    buyer.save()
+
+    uniswap.buyerCount = uniswap.buyerCount.plus(ONE_BI)
+    
+  } else {
+    buyer.totalVolumeUSD = buyer.totalVolumeUSD.plus(derivedAmountUSD)
+    buyer.totalVolumeETH = buyer.totalVolumeETH.plus(derivedAmountETH)
+    buyer.txCount = buyer.txCount.plus(ONE_BI)
+    buyer.save()
+  }
+
 
   // save entities
   pair.save()
