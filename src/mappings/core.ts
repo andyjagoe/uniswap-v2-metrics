@@ -1,4 +1,4 @@
-import { BigInt, BigDecimal, store } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, store, Address } from '@graphprotocol/graph-ts'
 import { Pair as PairContract, Mint, Burn, Swap, Transfer, Sync } from '../../generated/templates/Pair/Pair'
 import {
   Buyer,
@@ -11,14 +11,17 @@ import {
   Burn as BurnEvent,
   Swap as SwapEvent,
 } from "../../generated/schema"
+import { updatePairDayData, updateTokenDayData, updateUniswapDayData, updatePairHourData } from './dayUpdates'
 import { getEthPriceInUSD, findEthPerToken, getTrackedVolumeUSD, getTrackedLiquidityUSD } from './pricing'
 import {
   convertTokenToDecimal,
   ADDRESS_ZERO,
   FACTORY_ADDRESS,
   ONE_BI,
+  createLiquidityPosition,
   ZERO_BD,
   BI_18,
+  createLiquiditySnapshot
 } from './helpers'
 
 function isCompleteMint(mintId: string): boolean {
@@ -189,7 +192,6 @@ export function handleTransfer(event: Transfer): void {
     transaction.save()
   }
 
-  /*
   if (from.toHexString() != ADDRESS_ZERO && from.toHexString() != pair.id) {
     let fromUserLiquidityPosition = createLiquidityPosition(event.address, from)
     fromUserLiquidityPosition.liquidityTokenBalance = convertTokenToDecimal(pairContract.balanceOf(from), BI_18)
@@ -203,7 +205,6 @@ export function handleTransfer(event: Transfer): void {
     toUserLiquidityPosition.save()
     createLiquiditySnapshot(toUserLiquidityPosition, event)
   }
-  */
 
   transaction.save()
 }
@@ -316,7 +317,6 @@ export function handleMint(event: Mint): void {
   mint.amountUSD = amountTotalUSD as BigDecimal
   mint.save()
 
-  /*
   // update the LP position
   let liquidityPosition = createLiquidityPosition(event.address, mint.to as Address)
   createLiquiditySnapshot(liquidityPosition, event)
@@ -327,7 +327,6 @@ export function handleMint(event: Mint): void {
   updateUniswapDayData(event)
   updateTokenDayData(token0 as Token, event)
   updateTokenDayData(token1 as Token, event)
-  */
 }
 
 export function handleBurn(event: Burn): void {
@@ -380,7 +379,6 @@ export function handleBurn(event: Burn): void {
   burn.amountUSD = amountTotalUSD as BigDecimal
   burn.save()
 
-  /*
   // update the LP position
   let liquidityPosition = createLiquidityPosition(event.address, burn.sender as Address)
   createLiquiditySnapshot(liquidityPosition, event)
@@ -391,7 +389,6 @@ export function handleBurn(event: Burn): void {
   updateUniswapDayData(event)
   updateTokenDayData(token0 as Token, event)
   updateTokenDayData(token1 as Token, event)
-  */
 }
 
 export function handleSwap(event: Swap): void {
@@ -523,7 +520,6 @@ export function handleSwap(event: Swap): void {
   transaction.swaps = swaps
   transaction.save()
 
-  /*
   // update day entities
   let pairDayData = updatePairDayData(event)
   let pairHourData = updatePairHourData(event)
@@ -565,5 +561,4 @@ export function handleSwap(event: Swap): void {
   )
   token1DayData.save()
 
-  */
 }
