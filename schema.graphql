@@ -243,6 +243,8 @@ type UniswapDayData @entity {
   txCount: BigInt!
 
   newBuyerCount: BigInt!
+  activeBuyers: [String!]
+  activeBuyerCount: BigInt!
 }
 
 type PairHourData @entity {

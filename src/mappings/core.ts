@@ -1,4 +1,4 @@
-import { BigInt, BigDecimal, store, Address } from '@graphprotocol/graph-ts'
+import { log, BigInt, BigDecimal, store, Address } from '@graphprotocol/graph-ts'
 import { Pair as PairContract, Mint, Burn, Swap, Transfer, Sync } from '../../generated/templates/Pair/Pair'
 import {
   Buyer,
@@ -539,6 +539,10 @@ export function handleSwap(event: Swap): void {
 
   // new buyer specific updates
   if (isNewUser) uniswapDayData.newBuyerCount = uniswapDayData.newBuyerCount.plus(ONE_BI)
+  if (!uniswapDayData.activeBuyers.includes(event.params.to.toHexString())) {
+    uniswapDayData.activeBuyers = uniswapDayData.activeBuyers.concat([event.params.to.toHexString()])
+    uniswapDayData.activeBuyerCount = uniswapDayData.activeBuyerCount.plus(ONE_BI)
+  }
 
   // swap specific updating
   uniswapDayData.dailyVolumeUSD = uniswapDayData.dailyVolumeUSD.plus(trackedAmountUSD)
