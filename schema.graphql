@@ -241,6 +241,8 @@ type UniswapDayData @entity {
   totalLiquidityUSD: BigDecimal!
 
   txCount: BigInt!
+
+  newBuyerCount: BigInt!
 }
 
 type PairHourData @entity {
